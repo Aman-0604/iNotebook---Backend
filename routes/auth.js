@@ -6,8 +6,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 // JWT enables a very secure verification between user and backend/server
 const JWT_Secret = "Amanisagoodbb$oy";// Idealy you should keep this safe not here. You may keep it in .env.variable file
-
-// Create a User using : POST "/api/auth/createUser". No login required
+const fetch_user=require('../middleware/fetchUser');
+// Route 1 : Create a User using : POST "/api/auth/createUser". No login required
 // Use POST  not GET bcoz GET se URL me information chipakar aati hai and then your password won't be safe
 router.post('/createUser', [
     body('name', 'Enter a valid name').isLength({ min: 3 }),
@@ -50,7 +50,7 @@ router.post('/createUser', [
     }
 })
 
-// Authinticating a User using : POST "/api/auth/login". No login required
+// Route 2 : Authinticating a User using : POST "/api/auth/login". No login required
 // Use POST  not GET bcoz GET se URL me information chipakar aati hai and then your password won't be safe
 router.post('/login', [
     body('email', 'Enter a valid email').isEmail(),
@@ -81,5 +81,21 @@ router.post('/login', [
         res.status(500).send('Internal Server Error Occurred');
     }
 })
+// Route 3 : Get logged in User details using POST : "api/auth/getUser" . Login Required
+router.post('/getUser',fetch_user,async (req, res) => {
+    // MiddleWare ek function hota hai jo ki tab tab call hoga jab bhi aapke login vaale route  pe request aayegi
+    // We make middleware so as to make our project scaleable. For eg-> if user want to go to payment or blog or shop
+    // on the same website then he should not login again and again hence this thing will be handled by a middleware.
+
+    try {
+        userId=req.user.id;
+        const user = await User.findById(userId).select("-password");// Fetch every data instead of password
+        res.send(user);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('Internal Server Error Occurred');
+    }
+})
+
 
 module.exports = router;
