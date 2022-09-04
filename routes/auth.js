@@ -45,7 +45,7 @@ router.post('/createUser', [
 
 
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
         res.status(500).send('Some error occured');
     }
 })
@@ -77,7 +77,7 @@ router.post('/login', [
         const auth_token = jwt.sign(data, JWT_Secret);
         res.json({ auth_token });
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
         res.status(500).send('Internal Server Error Occurred');
     }
 })
@@ -92,7 +92,7 @@ router.post('/getUser',fetch_user,async (req, res) => {
         const user = await User.findById(userId).select("-password");// Fetch every data instead of password
         res.send(user);
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
         res.status(500).send('Internal Server Error Occurred');
     }
 })
