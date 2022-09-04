@@ -34,5 +34,24 @@ router.post('/addNotes', fetch_user, [
         res.status(500).send("Internal Server Error");
     }
 })
+// Route 3 : Update a note using : PUT "/api/notes/updateNotes". No login required
+router.put('/updateNotes/:id', fetch_user, async (req, res) => {//id here is object id not user id
+    const {title,description,tag}=req.body;//destructuring
+    const newNote={};
+    if(title){newNote.title=title};//agar request me title aa raha hai toh usse newNote ke title ke barabar kar do and agar nahi aa raha hai toh iska matlab user update nahi kar raha
+    if(description){newNote.description=description};
+    if(tag){newNote.tag=tag};
 
+    // Find the note to be updated and update it
+    let note= await Notes.findById(req.params.id);//params matlab jo url me id hai vaha se id lunga and check karunga
+    if(!note){
+        return res.status(404).send('Not found');
+    }
+    if(note.user.toString()!==req.user.id){// checking the id of the user whose these notes are and the id of the user who is requesting to update the notes
+        return res.status(401).send('Not Allowed');
+    }
+    note= await Notes.findByIdAndUpdate(req.params.id,{$set: newNote},{new:true});// The default is to return the original, unaltered document. If you want the new, updated document to be returned you have to pass an additional argument: an object with the new property set to true.
+    // new: bool - if true, return the modified document rather than the original. defaults to false (changed in 4.0)
+    res.json({note});
+})
 module.exports = router;
