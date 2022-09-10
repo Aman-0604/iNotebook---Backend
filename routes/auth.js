@@ -21,9 +21,10 @@ router.post('/createUser', [
     }
     // Check whether the user with this email already exists
     try {
+        let success =false;
         let user = await User.findOne({ email: req.body.email });
         if (user) {
-            return res.status(400).json({ error: 'Sorry a user with this email already exists' });
+            return res.status(400).json({ success,error: 'Sorry a user with this email already exists' });
         }
         const salt = await bcrypt.genSalt(10);
         const secured_password = await bcrypt.hash(req.body.password, salt);
@@ -38,10 +39,11 @@ router.post('/createUser', [
                 id: user.id
             }
         }
+        success=true;
         const auth_token = jwt.sign(data, JWT_Secret);
         // console.log(jwtData);
         // res.json(user)
-        res.json({ auth_token });
+        res.json({ success,auth_token });
 
 
     } catch (error) {
@@ -61,6 +63,7 @@ router.post('/login', [
         return res.status(400).json({ errors: errors.array() });
     }
     try {
+        let success =false;
         let user = await User.findOne({ email:req.body.email });//returns true or falase //I am in (ES6>=) hence I can write {email} instead of {email: email} if both the names are same
         if (!user) {
             return res.status(400).json('Invalid Credentials'); // I will show this not invalid email. Bcoz I don't want to tell the user that what is incorrect as the user might be a hacker
@@ -74,8 +77,9 @@ router.post('/login', [
                 id: user.id
             }
         }
+        success=true;
         const auth_token = jwt.sign(data, JWT_Secret);
-        res.json({ auth_token });
+        res.json({success, auth_token });
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Internal Server Error Occurred');
