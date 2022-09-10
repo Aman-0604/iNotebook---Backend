@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const NotesSchema = new Schema({
-    user:{// this will link user module to notes module so as to make notes visible to "only" the user of that notes not someone else. This is like a foriegn key in SQL.
+    user: {// this will link user module to notes module so as to make notes visible to "only" the user of that notes not someone else. This is like a foriegn key in SQL.
         type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
+        ref: 'User',
     },
     title: {
         type: String,
@@ -23,5 +23,5 @@ const NotesSchema = new Schema({
         default: Date.now
     },
 })
-
-module.exports = mongoose.model('Notes', NotesSchema);
+const Notes = mongoose.model('Notes', NotesSchema);
+module.exports = Notes;
